@@ -3,3 +3,4 @@ def random_choise(choise):
         choise = True
     else:
         choise = False
+    return choise
