@@ -25,7 +25,7 @@ def play_track(path, song_name):
             paused = True
             print("Paused")
 
-        elif command == "resume" and paused == True:
+        elif command == "resume" or command == "=" and paused == True:
             sd.play(y[position:], sr)
             start_time = time.time()
             paused = False
@@ -37,7 +37,12 @@ def play_track(path, song_name):
             break
 
         elif command == "status":
+            sd.stop()
+            elapsed = time.time() - start_time
+            position += int(elapsed * sr)
             current_sec = position / sr
+            sd.play(y[position:], sr)
+            start_time = time.time()
             print(f"Track: {song_name}")
             print(f"Second: {round(current_sec, 2)}")
 
