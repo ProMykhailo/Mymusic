@@ -4,9 +4,16 @@ import time
 import librosa
 import sounddevice as sd
 
-AUTHORS = ["A-HA"]
-folder = "direc-of-music/A-HA"
+AUTHORS = ["A-HA", "Testing"]
 
+
+
+print("Hello, here you can play some music")
+
+auth = input("Which author do you want to hear? ").strip()
+is_random = input("Randomize music? (yes/no): ").strip().lower()
+
+folder = f"direc-of-music/{auth}"
 
 def play_track(path, song_name):
     y, sr = librosa.load(path, sr=None)
@@ -70,14 +77,20 @@ def play_all():
 
     for file in os.listdir(folder):
         if file.endswith(".wav"):
-            songs.append(int(file.replace(".wav", "")))
+            songs.append((file.replace(".wav", "")))
+        elif file.endswith(".mp3"):
+            songs.append((file.replace(".mp3", "")))
 
     songs.sort()
 
     for song in songs:
-        path = f"{folder}/{song}.wav"
-        print(f"\nNow playing: {song}.wav")
-        play_track(path, f"{song}.wav")
+        try:
+            path = f"{folder}/{song}.wav"
+            print(f"\nNow playing: {song}.wav")
+            play_track(path, f"{song}.wav")
+        except Exception:
+            path = f"{folder}/{song}.mp3"
+            play_track(path, f"{song}.mp3")
 
 
 def play_random():
@@ -85,20 +98,23 @@ def play_random():
 
     for file in os.listdir(folder):
         if file.endswith(".wav"):
-            songs.append(int(file.replace(".wav", "")))
+            songs.append((file.replace(".wav", "")))
+        elif file.endswith(".mp3"):
+            songs.append((file.replace(".mp3", "")))
 
     random.shuffle(songs)
 
     for song in songs:
-        path = f"{folder}/{song}.wav"
-        print(f"\nNow playing: {song}.wav")
-        play_track(path, f"{song}.wav")
+        try:
+            path = f"{folder}/{song}.wav"
+            print(f"\nNow playing: {song}")
+            play_track(path, f"{song}.wav")
+        except Exception:
+            path = f"{folder}/{song}.mp3"
+            play_track(path, f"{song}.mp3")
 
 
-print("Hello, here you can play some music")
 
-auth = input("Which author do you want to hear? ").strip()
-is_random = input("Randomize music? (yes/no): ").strip().lower()
 
 if auth in AUTHORS:
     if is_random in ["yes", "ok", "true"]:
