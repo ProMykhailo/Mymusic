@@ -4,28 +4,26 @@ import time
 import librosa
 import sounddevice as sd
 
-AUTHORS = ["A-HA", "Testing"]
+AUTHORS = {"A-HA", "STH"}
+SUPPORTED_FORMATS = (".wav", ".mp3")
 
+def get_tracks(folder):
+    songs = []
+    for file in folder.iterdir():
+        if file.suffix.lower() in SUPPORTED_FORMATS:
+            songs.append(file)
 
-
-print("Hello, here you can play some music")
-
-auth = input("Which author do you want to hear? ").strip()
-is_random = input("Randomize music? (yes/no): ").strip().lower()
-
-folder = f"direc-of-music/{auth}"
+    return songs
 
 def play_track(path, song_name):
-    y, sr = librosa.load(path, sr=None)
+    y, sr = librosa.load(path,sr=None)
 
     position = 0
     start_time = time.time()
     paused = False
-
     sd.play(y[position:], sr)
 
     while True:
-
         if paused is False and sd.get_stream().active is False:
             print("Track ended")
             break
@@ -72,54 +70,41 @@ def play_track(path, song_name):
 
 
 
-def play_all():
-    songs = []
-
-    for file in os.listdir(folder):
-        if file.endswith(".wav"):
-            songs.append((file.replace(".wav", "")))
-        elif file.endswith(".mp3"):
-            songs.append((file.replace(".mp3", "")))
-
-    songs.sort()
-
+def play_all(folder, songs):
     for song in songs:
+        path = os.path.join(folder, song)
+        print(f"\nNow playing: {song}")
         try:
-            path = f"{folder}/{song}.wav"
-            print(f"\nNow playing: {song}.wav")
-            play_track(path, f"{song}.wav")
-        except Exception:
-            path = f"{folder}/{song}.mp3"
-            play_track(path, f"{song}.mp3")
+            play_track(path, song)
+        except Exception as e:
+            print(f"Cannot play {song}: {e}")
 
+def main():
+    print("Hello, here you can play some music")
 
-def play_random():
-    songs = []
+    auth = input("Which author do you want to hear? ").strip()
+    is_random = input("Randomize music? (yes/no): ").strip().lower()
+    folder = os.path.join("direc-of-music", auth)
 
-    for file in os.listdir(folder):
-        if file.endswith(".wav"):
-            songs.append((file.replace(".wav", "")))
-        elif file.endswith(".mp3"):
-            songs.append((file.replace(".mp3", "")))
+    if not os.path.isdir(folder):
+        print("Folder not found")
+        return
 
-    random.shuffle(songs)
+    songs = get_tracks(folder)
 
-    for song in songs:
-        try:
-            path = f"{folder}/{song}.wav"
-            print(f"\nNow playing: {song}")
-            play_track(path, f"{song}.wav")
-        except Exception:
-            path = f"{folder}/{song}.mp3"
-            play_track(path, f"{song}.mp3")
-
-
-
-
-if auth in AUTHORS:
-    if is_random in ["yes", "ok", "true"]:
-        play_random()
+    if not songs:
+        print("No songs found")
+        return
+    if auth in AUTHORS:
+        if is_random in ["yes", "ok", "true"]:
+            random.shuffle(songs)
+        else:
+            songs.sort()
     else:
-        play_all()
-else:
-    print("Author not found")
+        print("Author not found")
+    play_all(folder, songs)
+
+if __name__ == "__main__":
+    main()
+
+
