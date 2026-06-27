@@ -9,10 +9,10 @@ SUPPORTED_FORMATS = (".wav", ".mp3")
 
 def get_tracks(folder):
     songs = []
-    for file in folder.iterdir():
-        if file.suffix.lower() in SUPPORTED_FORMATS:
+    for file in os.listdir(folder):
+        name, ext = os.path.splitext(file)
+        if ext.lower() in SUPPORTED_FORMATS:
             songs.append(file)
-
     return songs
 
 def play_track(path, song_name):
